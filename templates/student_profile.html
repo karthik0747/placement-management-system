@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}My Profile — PlacementMS{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+<div class="card form-card">
+    <h2>My Profile</h2>
+    <p class="job-summary">Fill this once — we'll use it for every job application.</p>
+
+    <form method="post" action="/student/profile" enctype="multipart/form-data">
+        <label>Full Name</label>
+        <input type="text" value="{{ current_user.name }}" disabled>
+
+        <label>Email</label>
+        <input type="email" value="{{ current_user.email }}" disabled>
+
+        <label>CGPA</label>
+        <input type="number" name="cgpa" step="0.01" min="0" max="10" value="{{ current_user.cgpa or '' }}" placeholder="e.g. 8.5" required>
+
+        <label>Branch</label>
+        <input type="text" name="branch" value="{{ current_user.branch or '' }}" placeholder="e.g. CSE" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" value="{{ current_user.phone or '' }}" placeholder="e.g. 9876543210" required>
+
+        <label>Resume Link (Google Drive / LinkedIn URL)</label>
+        <input type="url" name="resume_link" value="{{ current_user.resume_link or '' }}" placeholder="Optional if you upload a file below">
+
+        <label>Or Upload Resume File (PDF/DOC/DOCX, max 5MB)</label>
+        <input type="file" name="resume_file" accept=".pdf,.doc,.docx">
+        {% if current_user.resume_filename %}
+        <p class="field-hint">Current file on record:
+            <a href="/static/uploads/{{ current_user.resume_filename }}" target="_blank">view uploaded resume</a>
+        </p>
+        {% endif %}
+
+        <button type="submit" class="btn">Save Profile</button>
+    </form>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Students — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Students</h1>
+<p class="page-subtitle">{{ students|length }} registered student{{ "s" if students|length != 1 else "" }}</p>
+
+<form method="get" action="/admin/students" class="filter-bar">
+    <input type="text" name="q" value="{{ search or '' }}" placeholder="Search by name or email...">
+    <select name="branch">
+        <option value="">All branches</option>
+        {% for b in branches %}
+        <option value="{{ b }}" {% if selected_branch == b %}selected{% endif %}>{{ b }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-small">Filter</button>
+    {% if search or selected_branch %}<a href="/admin/students" class="link-muted">Clear</a>{% endif %}
+</form>
+
+{% if students %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>CGPA</th>
+            <th>Branch</th>
+            <th>Phone</th>
+            <th>Resume</th>
+            <th>Applications</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for s in students %}
+        <tr>
+            <td>{{ s.name }}</td>
+            <td>{{ s.email }}</td>
+            <td>{{ s.cgpa or "—" }}</td>
+            <td>{{ s.branch or "—" }}</td>
+            <td>{{ s.phone or "—" }}</td>
+            <td>
+                {% if s.resume_filename %}
+                <a href="/static/uploads/{{ s.resume_filename }}" target="_blank">File</a>
+                {% elif s.resume_link %}
+                <a href="{{ s.resume_link }}" target="_blank">Link</a>
+                {% else %}—{% endif %}
+            </td>
+            <td>{{ s.applications|length }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No students match your filters.</p>
+{% endif %}
+{% endblock %}

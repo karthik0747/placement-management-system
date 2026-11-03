@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Post a Job — PlacementMS{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+<div class="card form-card">
+    <h2>Post a New Job</h2>
+    <p class="job-summary">Students only see jobs before the deadline.</p>
+    <form method="post" action="/admin/post-job">
+        <label>Job Title</label>
+        <input type="text" name="title" required>
+
+        <label>Company Name</label>
+        <input type="text" name="company" required>
+
+        <label>Description</label>
+        <textarea name="description" rows="4" placeholder="Role details, interview process, location..."></textarea>
+
+        <label>Package (e.g. 7 LPA)</label>
+        <input type="text" name="package">
+
+        <label>Minimum CGPA (e.g. 7.0)</label>
+        <input type="text" name="min_cgpa" placeholder="Leave blank if no minimum">
+
+        <label>Eligibility notes (e.g. CSE only, no backlogs)</label>
+        <input type="text" name="eligibility">
+
+        <label>Application Deadline (college portal)</label>
+        <input type="date" name="deadline" min="{{ today }}">
+
+        <label>Company Portal URL</label>
+        <input type="url" name="company_portal_url" placeholder="e.g. https://careers.tcs.com/apply">
+
+        <p class="field-hint">Students register here with the college, but must also apply on the company's own website (TCS NextStep, Amazon jobs, etc.).</p>
+
+        <button type="submit" class="btn">Post Job</button>
+    </form>
+</div>
+</div>
+{% endblock %}

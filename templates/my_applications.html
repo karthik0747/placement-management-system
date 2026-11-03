@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My Applications — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>My Applications</h1>
+<p class="page-subtitle">Track college registration status. Remember to also apply on the company portal if required.</p>
+
+{% if applications %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Job</th>
+            <th>Applied On</th>
+            <th>Drive Status</th>
+            <th>Your Status</th>
+            <th>Company Portal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        {% set drive = job_status_info(app.job) %}
+        <tr>
+            <td>
+                <strong>{{ app.job.title }}</strong><br>
+                <span class="text-muted">{{ app.job.company }} · CGPA {{ app.cgpa or "—" }} · {{ app.branch or "—" }}</span>
+            </td>
+            <td>{{ app.applied_on.strftime("%d %b %Y") }}</td>
+            <td>
+                {% if drive.open %}
+                <span class="badge badge-open">Open</span>
+                {% else %}
+                <span class="badge badge-closed">Closed</span>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+            </td>
+            <td>
+                {% if app.job.company_portal_url %}
+                <a href="{{ app.job.company_portal_url }}" target="_blank" rel="noopener">Apply on company site</a>
+                {% else %}—{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">You haven't applied to any jobs yet. <a href="/student/jobs">Browse open jobs</a></p>
+{% endif %}
+{% endblock %}

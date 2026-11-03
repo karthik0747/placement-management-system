@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Welcome, {{ current_user.name }}</h1>
+
+{% if not profile_complete %}
+<div class="alert alert-warning">
+    Complete your profile (CGPA, branch, phone, resume) before applying to jobs.
+    <a href="/student/profile">Set up profile &rarr;</a>
+</div>
+{% endif %}
+
+<div class="stats-grid">
+    <div class="card stat-card">
+        <span class="stat-number">{{ open_jobs_count }}</span>
+        <span class="stat-label">Open Jobs</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ jobs_applied }}</span>
+        <span class="stat-label">Applied</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ pending_count }}</span>
+        <span class="stat-label">Pending Review</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ selected_count }}</span>
+        <span class="stat-label">Selected</span>
+    </div>
+</div>
+
+<div class="action-row">
+    <a href="/student/jobs" class="btn">Browse Open Jobs</a>
+    <a href="/student/my-applications" class="btn btn-secondary">My Applications</a>
+    <a href="/student/profile" class="btn btn-secondary">My Profile</a>
+</div>
+
+{% if recent_applications %}
+<section class="section-block">
+    <h2>Recent Applications</h2>
+    <div class="mini-list">
+        {% for app in recent_applications %}
+        <div class="mini-list-item">
+            <div>
+                <strong>{{ app.job.title }}</strong> — {{ app.job.company }}
+            </div>
+            <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

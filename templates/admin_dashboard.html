@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Admin Panel</h1>
+
+<div class="stats-grid">
+    <div class="card stat-card">
+        <span class="stat-number">{{ total_students }}</span>
+        <span class="stat-label">Students</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ open_jobs }}</span>
+        <span class="stat-label">Open Jobs</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ pending_reviews }}</span>
+        <span class="stat-label">Pending Reviews</span>
+    </div>
+    <div class="card stat-card">
+        <span class="stat-number">{{ total_applications }}</span>
+        <span class="stat-label">Total Applications</span>
+    </div>
+</div>
+
+<div class="action-row">
+    <a href="/admin/post-job" class="btn">Post New Job</a>
+    <a href="/admin/applications?status=Pending" class="btn btn-secondary">Review Pending ({{ pending_reviews }})</a>
+    <a href="/admin/jobs" class="btn btn-secondary">View Jobs</a>
+</div>
+
+{% if recent_applications %}
+<section class="section-block">
+    <h2>Recent Applications</h2>
+    <div class="mini-list">
+        {% for app in recent_applications %}
+        <div class="mini-list-item">
+            <div>
+                <strong>{{ app.student.name }}</strong> applied for {{ app.job.title }} at {{ app.job.company }}
+            </div>
+            <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="/admin/applications" class="link-muted">View all applications &rarr;</a>
+</section>
+{% endif %}
+{% endblock %}

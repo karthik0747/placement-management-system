@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Analytics — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Analytics</h1>
+<p class="page-subtitle">Placement activity at a glance</p>
+
+<div class="analytics-grid">
+    <div class="card chart-card">
+        <h3>Applications by Status</h3>
+        <canvas id="statusChart"></canvas>
+    </div>
+    <div class="card chart-card">
+        <h3>Top Jobs by Applications</h3>
+        <canvas id="jobsChart"></canvas>
+    </div>
+    <div class="card chart-card">
+        <h3>Students by Branch</h3>
+        <canvas id="branchChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+const statusData = {
+    labels: {{ status_counts.keys()|list|tojson }},
+    datasets: [{
+        data: {{ status_counts.values()|list|tojson }},
+        backgroundColor: ['#fbc02d', '#43a047', '#e53935']
+    }]
+};
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: statusData,
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+
+const jobsData = {
+    labels: {{ job_labels|tojson }},
+    datasets: [{
+        label: 'Applications',
+        data: {{ job_counts|tojson }},
+        backgroundColor: '#1a237e'
+    }]
+};
+new Chart(document.getElementById('jobsChart'), {
+    type: 'bar',
+    data: jobsData,
+    options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+});
+
+const branchData = {
+    labels: {{ branch_labels|tojson }},
+    datasets: [{
+        data: {{ branch_counts|tojson }},
+        backgroundColor: ['#3949ab', '#5c6bc0', '#7986cb', '#9fa8da', '#c5cae9', '#1a237e', '#283593']
+    }]
+};
+new Chart(document.getElementById('branchChart'), {
+    type: 'pie',
+    data: branchData,
+    options: { plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

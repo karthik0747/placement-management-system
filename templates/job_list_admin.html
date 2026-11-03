@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Posted Jobs — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Posted Jobs</h1>
+<a href="/admin/post-job" class="btn">Post New Job</a>
+
+<form method="get" action="/admin/jobs" class="filter-bar">
+    <input type="text" name="q" value="{{ search or '' }}" placeholder="Search by title or company...">
+    <button type="submit" class="btn btn-small">Search</button>
+    {% if search %}<a href="/admin/jobs" class="link-muted">Clear</a>{% endif %}
+</form>
+
+{% if jobs %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Package</th>
+            <th>Deadline</th>
+            <th>Applications</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        {% set info = job_status_info(job) %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td>{{ job.company }}</td>
+            <td>{{ job.package or "—" }}</td>
+            <td>{{ job.deadline.strftime("%d %b %Y") if job.deadline else "No deadline" }}</td>
+            <td>
+                {{ job_stats[job.id] }}
+                {% if job_stats[job.id] > 0 %}
+                <a href="/admin/applications?job_id={{ job.id }}" class="link-muted">view</a>
+                {% endif %}
+            </td>
+            <td>
+                {% if info.open %}
+                <span class="badge badge-open">{{ info.label }}</span>
+                {% else %}
+                <span class="badge badge-closed">{{ info.label }}</span>
+                <div class="text-muted">{{ info.reason }}</div>
+                {% endif %}
+            </td>
+            <td class="table-actions">
+                {% if job.company_portal_url %}
+                <a href="{{ job.company_portal_url }}" target="_blank" rel="noopener" class="btn btn-small btn-secondary">Portal</a>
+                {% endif %}
+                {% if info.open %}
+                <form method="post" action="/admin/jobs/{{ job.id }}/close" class="inline-form">
+                    <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Close this posting? Students cannot apply after this.')">Close</button>
+                </form>
+                {% elif job.status == "closed" %}
+                <form method="post" action="/admin/jobs/{{ job.id }}/reopen" class="inline-form">
+                    <button type="submit" class="btn btn-small">Reopen</button>
+                </form>
+                {% else %}
+                <span class="text-muted">Auto-closed</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No jobs posted yet.</p>
+{% endif %}
+{% endblock %}

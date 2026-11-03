@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}All Applications — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Applications</h1>
+
+<form method="get" action="/admin/applications" class="filter-bar">
+    <input type="text" name="q" value="{{ search or '' }}" placeholder="Search student name/email/branch...">
+    <select name="status">
+        <option value="all" {% if selected_status == "all" %}selected{% endif %}>All statuses</option>
+        <option value="Pending" {% if selected_status == "Pending" %}selected{% endif %}>Pending</option>
+        <option value="Selected" {% if selected_status == "Selected" %}selected{% endif %}>Selected</option>
+        <option value="Rejected" {% if selected_status == "Rejected" %}selected{% endif %}>Rejected</option>
+    </select>
+    <select name="job_id">
+        <option value="">All jobs</option>
+        {% for job in all_jobs %}
+        <option value="{{ job.id }}" {% if selected_job_id == job.id %}selected{% endif %}>
+            {{ job.company }} — {{ job.title }}
+        </option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-small">Filter</button>
+    <a href="/admin/applications/export.csv?status={{ selected_status }}&job_id={{ selected_job_id or '' }}" class="btn btn-small btn-secondary">Export CSV</a>
+</form>
+
+{% if applications %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Job</th>
+            <th>CGPA</th>
+            <th>Branch</th>
+            <th>Applied On</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applications %}
+        <tr>
+            <td>
+                <strong>{{ app.student.name }}</strong><br>
+                <span class="text-muted">{{ app.student.email }}</span>
+            </td>
+            <td>
+                <strong>{{ app.job.title }}</strong><br>
+                <span class="text-muted">{{ app.job.company }}</span>
+            </td>
+            <td>{{ app.cgpa or "—" }}</td>
+            <td>{{ app.branch or "—" }}</td>
+            <td>{{ app.applied_on.strftime("%d %b %Y") }}</td>
+            <td>
+                <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+            </td>
+            <td>
+                <a href="/admin/applications/{{ app.id }}" class="btn btn-small btn-secondary">View</a>
+                <form method="post" action="/admin/applications/{{ app.id }}/update" class="inline-form">
+                    <select name="status">
+                        <option value="Pending" {% if app.status == "Pending" %}selected{% endif %}>Pending</option>
+                        <option value="Selected" {% if app.status == "Selected" %}selected{% endif %}>Selected</option>
+                        <option value="Rejected" {% if app.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="btn btn-small">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty">No applications match your filters.</p>
+{% endif %}
+{% endblock %}

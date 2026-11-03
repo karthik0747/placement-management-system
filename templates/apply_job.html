@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Apply — {{ job.title }} — PlacementMS{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+<div class="card form-card">
+    <h2>Apply for {{ job.title }}</h2>
+    <p class="job-summary">{{ job.company }} · {{ job.package or "Package TBD" }}</p>
+
+    {% if job.company_portal_url %}
+    <div class="alert alert-info">
+        <strong>Two-step process:</strong>
+        (1) Submit here to register with the placement cell.
+        (2) You must also apply on the
+        <a href="{{ job.company_portal_url }}" target="_blank" rel="noopener">{{ job.company }} company portal</a>.
+    </div>
+    {% endif %}
+
+    {% if not eligible %}
+    <div class="alert alert-error">Your CGPA ({{ current_user.cgpa }}) is below the minimum required ({{ job.min_cgpa }}).</div>
+    {% endif %}
+
+    <div class="profile-preview">
+        <p><strong>Name:</strong> {{ current_user.name }}</p>
+        <p><strong>Email:</strong> {{ current_user.email }}</p>
+        <p><strong>CGPA:</strong> {{ current_user.cgpa }}</p>
+        <p><strong>Branch:</strong> {{ current_user.branch }}</p>
+        <p><strong>Phone:</strong> {{ current_user.phone }}</p>
+        <p><strong>Resume:</strong>
+            {% if current_user.resume_filename %}
+            <a href="/static/uploads/{{ current_user.resume_filename }}" target="_blank">View uploaded file</a>
+            {% elif current_user.resume_link %}
+            <a href="{{ current_user.resume_link }}" target="_blank">View</a>
+            {% else %}—{% endif %}
+        </p>
+        <a href="/student/profile" class="link-muted">Edit profile</a>
+    </div>
+
+    <form method="post" action="/student/apply/{{ job.id }}">
+        <label>Why do you want this job?</label>
+        <textarea name="cover_letter" rows="5" placeholder="Briefly explain your interest and relevant skills..." required></textarea>
+
+        <div class="form-actions">
+            {% if eligible %}
+            <button type="submit" class="btn">Submit Application</button>
+            {% endif %}
+            <a href="/student/jobs" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

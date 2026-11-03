@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Notifications — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Notifications</h1>
+
+{% if notifications %}
+<div class="mini-list">
+    {% for n in notifications %}
+    <div class="mini-list-item">
+        <div>
+            <span>{{ n.message }}</span><br>
+            <span class="text-muted">{{ n.created_at.strftime("%d %b %Y, %I:%M %p") }}</span>
+        </div>
+        {% if n.link %}<a href="{{ n.link }}" class="link-muted">View &rarr;</a>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty">No notifications yet. You'll be notified here when your application status changes.</p>
+{% endif %}
+{% endblock %}

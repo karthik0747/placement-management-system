@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Application — {{ app.student.name }} — PlacementMS{% endblock %}
+
+{% block content %}
+<a href="/admin/applications" class="link-muted">&larr; Back to applications</a>
+
+<div class="card detail-card">
+    <div class="detail-header">
+        <div>
+            <h1>{{ app.student.name }}</h1>
+            <p class="page-subtitle">Applied for {{ app.job.title }} at {{ app.job.company }}</p>
+        </div>
+        <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+    </div>
+
+    <div class="detail-grid">
+        <div>
+            <h3>Student Details</h3>
+            <p><strong>Email:</strong> {{ app.student.email }}</p>
+            <p><strong>CGPA:</strong> {{ app.cgpa or "—" }}</p>
+            <p><strong>Branch:</strong> {{ app.branch or "—" }}</p>
+            <p><strong>Phone:</strong> {{ app.phone or "—" }}</p>
+            <p><strong>Resume:</strong>
+                {% if app.resume_filename %}
+                <a href="/static/uploads/{{ app.resume_filename }}" target="_blank">Download uploaded file</a>
+                {% elif app.resume_link %}
+                <a href="{{ app.resume_link }}" target="_blank">Open resume</a>
+                {% else %}—{% endif %}
+            </p>
+        </div>
+        <div>
+            <h3>Job Details</h3>
+            <p><strong>Package:</strong> {{ app.job.package or "—" }}</p>
+            <p><strong>Min CGPA:</strong> {{ app.job.min_cgpa or "—" }}</p>
+            <p><strong>Eligibility:</strong> {{ app.job.eligibility or "—" }}</p>
+            <p><strong>Drive status:</strong>
+                {% set drive = job_status_info(app.job) %}
+                {% if drive.open %}
+                <span class="badge badge-open">Open</span>
+                {% else %}
+                <span class="badge badge-closed">Closed</span> — {{ drive.reason }}
+                {% endif %}
+            </p>
+            {% if app.job.company_portal_url %}
+            <p><strong>Company portal:</strong>
+                <a href="{{ app.job.company_portal_url }}" target="_blank" rel="noopener">Open link</a>
+            </p>
+            {% endif %}
+            <p><strong>Applied on:</strong> {{ app.applied_on.strftime("%d %b %Y, %I:%M %p") }}</p>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Cover Letter</h3>
+        <p class="cover-letter">{{ app.cover_letter or "No cover letter provided." }}</p>
+    </div>
+
+    <form method="post" action="/admin/applications/{{ app.id }}/update" class="inline-form">
+        <label>Update status</label>
+        <select name="status">
+            <option value="Pending" {% if app.status == "Pending" %}selected{% endif %}>Pending</option>
+            <option value="Selected" {% if app.status == "Selected" %}selected{% endif %}>Selected</option>
+            <option value="Rejected" {% if app.status == "Rejected" %}selected{% endif %}>Rejected</option>
+        </select>
+        <button type="submit" class="btn">Save Status</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Placement Management System{% endblock %}</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="{% if current_user %}with-sidebar{% endif %}">
+    <nav class="navbar">
+        <a href="{% if current_user and current_user.role == 'admin' %}/admin/dashboard{% elif current_user %}/student/dashboard{% else %}/{% endif %}" class="brand">PlacementMS</a>
+        <div class="nav-links">
+            {% if current_user %}
+                {% if current_user.role == "student" %}
+                <a href="/student/notifications" class="bell-link">
+                    Notifications
+                    {% if unread_notifications %}<span class="badge-count">{{ unread_notifications }}</span>{% endif %}
+                </a>
+                {% endif %}
+                <span class="nav-user">{{ current_user.name }}</span>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="app-layout">
+        {% if current_user %}
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                {% if current_user.role == "admin" %}
+                    <a href="/admin/dashboard" class="{% if request.path == '/admin/dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="/admin/post-job" class="{% if request.path == '/admin/post-job' %}active{% endif %}">Post Job</a>
+                    <a href="/admin/jobs" class="{% if request.path == '/admin/jobs' %}active{% endif %}">Jobs</a>
+                    <a href="/admin/applications" class="{% if request.path.startswith('/admin/applications') %}active{% endif %}">Applications</a>
+                    <a href="/admin/students" class="{% if request.path == '/admin/students' %}active{% endif %}">Students</a>
+                    <a href="/admin/analytics" class="{% if request.path == '/admin/analytics' %}active{% endif %}">Analytics</a>
+                {% else %}
+                    <a href="/student/dashboard" class="{% if request.path == '/student/dashboard' %}active{% endif %}">Dashboard</a>
+                    <a href="/student/jobs" class="{% if request.path == '/student/jobs' %}active{% endif %}">Browse Jobs</a>
+                    <a href="/student/my-applications" class="{% if request.path == '/student/my-applications' %}active{% endif %}">My Applications</a>
+                    <a href="/student/profile" class="{% if request.path == '/student/profile' %}active{% endif %}">Profile</a>
+                    <a href="/student/notifications" class="{% if request.path == '/student/notifications' %}active{% endif %}">Notifications</a>
+                {% endif %}
+            </nav>
+        </aside>
+        {% endif %}
+
+        <main class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-group">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

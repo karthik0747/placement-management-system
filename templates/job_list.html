@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Available Jobs — PlacementMS{% endblock %}
+
+{% block content %}
+<h1>Open Jobs</h1>
+<p class="page-subtitle">{{ jobs|length }} placement drive{{ "s" if jobs|length != 1 else "" }} accepting applications</p>
+
+{% if not profile_complete %}
+<div class="alert alert-warning">
+    Set up your profile before applying. <a href="/student/profile">Complete profile &rarr;</a>
+</div>
+{% endif %}
+
+<form method="get" action="/student/jobs" class="filter-bar">
+    <input type="text" name="q" value="{{ search or '' }}" placeholder="Search by title or company...">
+    <button type="submit" class="btn btn-small">Search</button>
+    {% if search %}<a href="/student/jobs" class="link-muted">Clear</a>{% endif %}
+</form>
+
+{% if jobs %}
+<div class="job-grid">
+    {% for job in jobs %}
+    {% set eligible = meets_cgpa_requirement(current_user.cgpa, job.min_cgpa) %}
+    <div class="card job-card">
+        <div class="job-card-header">
+            <h3>{{ job.title }}</h3>
+            <span class="badge badge-open">Open</span>
+        </div>
+        <p class="job-company">{{ job.company }}</p>
+        {% if job.package %}<p class="job-meta"><strong>Package:</strong> {{ job.package }}</p>{% endif %}
+        {% if job.min_cgpa %}<p class="job-meta"><strong>Min CGPA:</strong> {{ job.min_cgpa }}</p>{% endif %}
+        {% if job.eligibility %}<p class="job-meta"><strong>Eligibility:</strong> {{ job.eligibility }}</p>{% endif %}
+        {% if job.deadline %}<p class="job-meta"><strong>College deadline:</strong> {{ job.deadline.strftime("%d %b %Y") }}</p>{% endif %}
+        {% if job.company_portal_url %}
+        <p class="job-meta">
+            <strong>Company portal:</strong>
+            <a href="{{ job.company_portal_url }}" target="_blank" rel="noopener">Apply on {{ job.company }} site &rarr;</a>
+        </p>
+        {% endif %}
+        {% if job.description %}<p class="job-desc">{{ job.description }}</p>{% endif %}
+
+        {% if job.company_portal_url %}
+        <p class="portal-note">Register here with college + apply separately on company website.</p>
+        {% endif %}
+
+        <div class="job-card-actions">
+            {% if job.id in applied_job_ids %}
+            <button class="btn btn-applied" disabled>Applied &#10003;</button>
+            {% elif not profile_complete %}
+            <a href="/student/profile" class="btn btn-secondary">Complete Profile to Apply</a>
+            {% elif not eligible %}
+            <span class="ineligible-note">CGPA below requirement (min {{ job.min_cgpa }})</span>
+            {% else %}
+            <a href="/student/apply/{{ job.id }}" class="btn">Apply Now</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty">No open jobs right now. Check back when the placement cell posts new drives.</p>
+{% endif %}
+{% endblock %}
